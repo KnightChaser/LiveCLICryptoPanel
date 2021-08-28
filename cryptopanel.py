@@ -12,6 +12,8 @@ def gatherInformation():
     # cryptocurrency information
     responseCryptoAPI = requests.get("https://api.coincap.io/v2/assets")
 
+    responseCryptoAPI.encoding = 'UTF-8'
+
     if "Too many requests, please try again later." in responseCryptoAPI.text:
         print("Failed to gather data. Rate exceeded.")
         return None, None
@@ -19,9 +21,11 @@ def gatherInformation():
     # fiat currency (USD <---> KRW) exchange rate information
     try:
         responseUSDKRWExchangeRateAPI = requests.get("https://exchange.jaeheon.kr:23490/query/USDKRW")
+        responseUSDKRWExchangeRateAPI.encoding = 'UTF-8'
     except:
         print("Failed to load fiat currency exchange rate. You'd better to check API status.")
         return None, None
+
 
     cryptoDataBundle = json.loads(responseCryptoAPI.text).get("data")
     USDKRWExchangeRate = int(float(json.loads(responseUSDKRWExchangeRateAPI.text).get("USDKRW")[0]))
