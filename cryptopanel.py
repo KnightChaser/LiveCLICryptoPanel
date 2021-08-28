@@ -49,7 +49,7 @@ while True:
 
     if cryptoDataBundle == None or USDKRWExchangeRate == None:
 
-        message = Back.WHITE + Fore.BLACK + "API call failed. We'll try after 3 seconds\n Please consider it may suddenly stop and run frequently\n because it's powered by free crypto API.\n" + Style.RESET_ALL
+        message = Back.WHITE + Fore.BLACK + "API call failed. We'll request after 3 seconds\n Please consider it may suddenly stop and run frequently\n because it's powered by free crypto API.\n" + Style.RESET_ALL
         message += Back.WHITE + Fore.BLACK + "API 요청에 실패해서 3초 뒤에 재요청을 보낼 예정입니다. \n 이 프로그램은 무료 암호화폐 API로부터 데이터를 받는 것이라 한계가 있어 중도에 잠깐 멈출 수 있다는 것을 양해해 주세요.\n" + Style.RESET_ALL
         print(message)
         apiCallFailedCount += 1
@@ -67,48 +67,57 @@ while True:
         else:
             uptimeRatio = 100
 
-        print("=== Live CLI Crypto Pannel === ")
-        print("업데이트 시각 : {} | 업데이트 횟수 : {} 회 | API Call 실패 : {} | Uptime : {} % "
-                .format(now.strftime('%Y년 %m월 %d일 %H시 %M분 %S초'), updateCycleCount, apiCallFailedCount, uptimeRatio))
-        print()             #new line
+        # actual running
+        try:
+            print("=== Live CLI Crypto Pannel === ")
+            print("업데이트 시각 : {} | 업데이트 횟수 : {} 회 | API Call 실패 : {} | Uptime : {} % "
+                    .format(now.strftime('%Y년 %m월 %d일 %H시 %M분 %S초'), updateCycleCount, apiCallFailedCount, uptimeRatio))
+            print()             #new line
 
-        # process the gathered information
-        print("  암호화폐          현재 가격 (변동률)            24시간 거래량               시가총액                             공급량  ")
-        print("=============================================================================================================================================")
+            # process the gathered information
+            print("  암호화폐          현재 가격 (변동률)            24시간 거래량               시가총액                             공급량  ")
+            print("=============================================================================================================================================")
 
-        for cryptoInfo in cryptoDataBundle:
-            if int(cryptoInfo.get("rank")) <= cryptoVarietyQty:
+            for cryptoInfo in cryptoDataBundle:
+                if int(cryptoInfo.get("rank")) <= cryptoVarietyQty:
 
-                rank = int(cryptoInfo.get("rank"))
-                name = cryptoInfo.get("name")
-                symbol = cryptoInfo.get("symbol")
-                priceKRW = "{:,}".format(round(float(cryptoInfo.get("priceUsd")) * USDKRWExchangeRate, 2))
-                changePercent24Hr = "{:.2f}".format(round(float(cryptoInfo.get("changePercent24Hr")), 2)).zfill(6)
-                volumeKRW24Hr = "{:,}".format(round(float(cryptoInfo.get("volumeUsd24Hr")) * USDKRWExchangeRate))
-                marketCapKRW = "{:,}".format(round(float(cryptoInfo.get("marketCapUsd")) * USDKRWExchangeRate))
-                supply = "{:,}".format(round(float(cryptoInfo.get("supply"))))
+                    rank = int(cryptoInfo.get("rank"))
+                    name = cryptoInfo.get("name")
+                    symbol = cryptoInfo.get("symbol")
+                    priceKRW = "{:,}".format(round(float(cryptoInfo.get("priceUsd")) * USDKRWExchangeRate, 2))
+                    changePercent24Hr = "{:.2f}".format(round(float(cryptoInfo.get("changePercent24Hr")), 2)).zfill(6)
+                    volumeKRW24Hr = "{:,}".format(round(float(cryptoInfo.get("volumeUsd24Hr")) * USDKRWExchangeRate))
+                    marketCapKRW = "{:,}".format(round(float(cryptoInfo.get("marketCapUsd")) * USDKRWExchangeRate))
+                    supply = "{:,}".format(round(float(cryptoInfo.get("supply"))))
 
-                # Arrow direction and colorize chagnes rate as change
-                if float(changePercent24Hr) > 0:                                                                            # UP
-                    changePercent24Hr = Back.RED + Fore.WHITE + str(changePercent24Hr)  + " % " + Style.RESET_ALL
-                    changeDirectionArrow = Back.RED + Fore.WHITE + "▲" + Style.RESET_ALL
-                elif float(changePercent24Hr) < 0:                                                                          # DOWN
-                    changePercent24Hr = Back.BLUE + Fore.WHITE + str(changePercent24Hr)  + " % " + Style.RESET_ALL
-                    changeDirectionArrow = Back.BLUE + Fore.WHITE + "▲" + Style.RESET_ALL
-                else:                                                                                                       # Steady (0% change rate recorded)
-                    changePercent24Hr = Back.BLACK + Fore.WHITE + str(changePercent24Hr) + " % " + Style.RESET_ALL
-                    changeDirectionArrow = Back.BLACK + Fore.WHITE + "■" + Style.RESET_ALL
+                    # Arrow direction and colorize chagnes rate as change
+                    if float(changePercent24Hr) > 0:                                                                            # UP
+                        changePercent24Hr = Back.RED + Fore.WHITE + str(changePercent24Hr)  + " % " + Style.RESET_ALL
+                        changeDirectionArrow = Back.RED + Fore.WHITE + "▲" + Style.RESET_ALL
+                    elif float(changePercent24Hr) < 0:                                                                          # DOWN
+                        changePercent24Hr = Back.BLUE + Fore.WHITE + str(changePercent24Hr)  + " % " + Style.RESET_ALL
+                        changeDirectionArrow = Back.BLUE + Fore.WHITE + "▲" + Style.RESET_ALL
+                    else:                                                                                                       # Steady (0% change rate recorded)
+                        changePercent24Hr = Back.BLACK + Fore.WHITE + str(changePercent24Hr) + " % " + Style.RESET_ALL
+                        changeDirectionArrow = Back.BLACK + Fore.WHITE + "■" + Style.RESET_ALL
 
 
-                # maxSupply contents may be None if its value is infinity(∞)
-                if cryptoInfo.get("maxSupply") != None:
-                    maxSupply = "{:,}".format(round(float(cryptoInfo.get("maxSupply"))))
-                else:
-                    maxSupply = "∞"
+                    # maxSupply contents may be None if its value is infinity(∞)
+                    if cryptoInfo.get("maxSupply") != None:
+                        maxSupply = "{:,}".format(round(float(cryptoInfo.get("maxSupply"))))
+                    else:
+                        maxSupply = "∞"
 
-                print("""[#{0:0>2}] {1:<6} | ₩ {2:>13} ({3}{4}) | ₩ {5:>19} | ₩ {6:>22} | {7:>20} / {8:>15} {9: <5}""".
-                    format(rank, symbol, priceKRW, changePercent24Hr, changeDirectionArrow, volumeKRW24Hr, marketCapKRW, supply, maxSupply, symbol
-                    ,end=''))
+                    print("""[#{0:0>2}] {1:<6} | ₩ {2:>13} ({3}{4}) | ₩ {5:>19} | ₩ {6:>22} | {7:>20} / {8:>15} {9: <5}""".
+                        format(rank, symbol, priceKRW, changePercent24Hr, changeDirectionArrow, volumeKRW24Hr, marketCapKRW, supply, maxSupply, symbol
+                        ,end=''))
 
-        # update interval is every 20 seconds
-        sleep(20)
+            # update interval is every 20 seconds
+            sleep(20)
+
+        except:
+            message = Back.WHITE + Fore.BLACK + "Unexpected elements detected in received data from API. We'll request after 3 seconds\n" + Style.RESET_ALL
+            message += Back.WHITE + Fore.BLACK + "API로부터 받은 데이터에 예상하지 못한 값이 있습니다. 3초 뒤에 재요청하겠습니다.\n" + Style.RESET_ALL
+            print(message)
+            apiCallFailedCount += 1
+            sleep(3)
