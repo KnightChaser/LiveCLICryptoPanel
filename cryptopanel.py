@@ -74,7 +74,7 @@ while True:
         # actual running
         try:
             print("=== Live CLI Crypto Pannel === ")
-            print("업데이트 시각 : {} | 업데이트 횟수 : {} 회 | API Call 실패 : {} | Uptime : {} % "
+            print("업데이트 시각 : {} | 업데이트 횟수 : {} 회 | API Call 실패 : {} 회 | Uptime 비율 : {} % "
                     .format(now.strftime('%Y년 %m월 %d일 %H시 %M분 %S초'), updateCycleCount, apiCallFailedCount, uptimeRatio))
             print()             #new line
 
@@ -89,21 +89,21 @@ while True:
                     name = cryptoInfo.get("name")
                     symbol = cryptoInfo.get("symbol")
                     priceKRW = "{:,}".format(round(float(cryptoInfo.get("priceUsd")) * USDKRWExchangeRate, 2))
-                    changePercent24Hr = "{:.2f}".format(round(float(cryptoInfo.get("changePercent24Hr")), 2)).zfill(6)
+                    changePercent24Hr = "{:.2f}".format(round(float(cryptoInfo.get("changePercent24Hr")), 2))
                     volumeKRW24Hr = "{:,}".format(round(float(cryptoInfo.get("volumeUsd24Hr")) * USDKRWExchangeRate))
                     marketCapKRW = "{:,}".format(round(float(cryptoInfo.get("marketCapUsd")) * USDKRWExchangeRate))
                     supply = "{:,}".format(round(float(cryptoInfo.get("supply"))))
 
                     # Arrow direction and colorize chagnes rate as change
                     if float(changePercent24Hr) > 0:                                                                            # UP
-                        changePercent24Hr = Back.RED + Fore.WHITE + str(changePercent24Hr)  + " % " + Style.RESET_ALL
-                        changeDirectionArrow = Back.RED + Fore.WHITE + "▲" + Style.RESET_ALL
+                        changePercent24Hr = Back.RED + Fore.WHITE + "(" + str(changePercent24Hr)  + " % " + Style.RESET_ALL
+                        changeDirectionArrow = Back.RED + Fore.WHITE + "▲" + ")" + Style.RESET_ALL
                     elif float(changePercent24Hr) < 0:                                                                          # DOWN
-                        changePercent24Hr = Back.BLUE + Fore.WHITE + str(changePercent24Hr)  + " % " + Style.RESET_ALL
-                        changeDirectionArrow = Back.BLUE + Fore.WHITE + "▲" + Style.RESET_ALL
+                        changePercent24Hr = Back.BLUE + Fore.WHITE + "(" + str(changePercent24Hr)  + " % " + Style.RESET_ALL
+                        changeDirectionArrow = Back.BLUE + Fore.WHITE + "▲" + ")" + Style.RESET_ALL
                     else:                                                                                                       # Steady (0% change rate recorded)
-                        changePercent24Hr = Back.BLACK + Fore.WHITE + str(changePercent24Hr) + " % " + Style.RESET_ALL
-                        changeDirectionArrow = Back.BLACK + Fore.WHITE + "■" + Style.RESET_ALL
+                        changePercent24Hr = Back.BLACK + Fore.WHITE + "(" + str(changePercent24Hr) + " % " + Style.RESET_ALL
+                        changeDirectionArrow = Back.BLACK + Fore.WHITE + "■" + ")" + Style.RESET_ALL
 
 
                     # maxSupply contents may be None if its value is infinity(∞)
@@ -112,7 +112,7 @@ while True:
                     else:
                         maxSupply = "∞"
 
-                    print("""[#{0:0>2}] {1:<6} | ₩ {2:>13} ({3}{4}) | ₩ {5:>19} | ₩ {6:>22} | {7:>20} / {8:>15} {9: <5}""".
+                    print("""[#{0:0>2}] {1:<6} | ₩ {2:>13} {3:>24}{4} | ₩ {5:>19} | ₩ {6:>22} | {7:>20} / {8:>15} {9: <5}""".
                         format(rank, symbol, priceKRW, changePercent24Hr, changeDirectionArrow, volumeKRW24Hr, marketCapKRW, supply, maxSupply, symbol
                         ,end=''))
 
