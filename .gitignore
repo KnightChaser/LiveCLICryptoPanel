@@ -112,3 +112,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+LiveCryptoPanel_upbitAPI/upbit_logo.ico
+LiveCryptoPanel_upbitAPI/upbit_logo.png
