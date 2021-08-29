@@ -33,17 +33,14 @@ def createQueryURL():
 
 
 # gather necessary information
-def gatherInformation():
+def gatherInformation(APIqueryURL):
 
-    # get current URL for querying
-    queryURL = createQueryURL()
-
-    if queryURL == "createQueryURLFailed":
+    if APIqueryURL == "createQueryURLFailed":
         return "APIqueryURLFailed"
 
     try:
         # cryptocurrency information
-        responseCryptoAPI = requests.get(queryURL)
+        responseCryptoAPI = requests.get(APIqueryURL)
         responseCryptoAPI.encoding = 'UTF-8'
     except:
         # unexpected error occured
@@ -55,9 +52,9 @@ def gatherInformation():
     return cryptoDataBundle
 
 
-def cryptoDataProcessing(cryptoShowQuantity):
+def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity):
 
-    cryptoDataBundle = gatherInformation()
+    cryptoDataBundle = gatherInformation(APIqueryURL)
 
     # error handling
     if cryptoDataBundle == "APIqueryURLFailed":
@@ -124,12 +121,14 @@ def runProgram():
     if cryptoShowQuantity < 1 or cryptoShowQuantity > 75:
         sys.exit("Check your quantity input and try again. It's wrong input.")
 
+    APIqueryURL = createQueryURL()
+
     while True:
         # os.system("cls")                      # <-- to reduce void screen time, I inserted this into function cryptoDataProcessing()
         now = datetime.datetime.now()
 
         # run!
-        runtimeResult = cryptoDataProcessing(cryptoShowQuantity)
+        runtimeResult = cryptoDataProcessing(APIqueryURL, cryptoShowQuantity)
         
         # runtime procedure verification
         if runtimeResult == "successfulProcessing":
