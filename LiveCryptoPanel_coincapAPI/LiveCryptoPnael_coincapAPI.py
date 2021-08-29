@@ -73,7 +73,7 @@ while True:
 
         # actual running
         try:
-            print("=== Live CLI Crypto Pannel === ")
+            print("=== Live CLI Crypto Pannel ( Worldwide, Exchange-integrated ) === ")
             print("업데이트 시각 : {} | 업데이트 횟수 : {} 회 | API Call 실패 : {} 회 | Uptime 비율 : {} % "
                     .format(now.strftime('%Y년 %m월 %d일 %H시 %M분 %S초'), updateCycleCount, apiCallFailedCount, uptimeRatio))
             print()             #new line
