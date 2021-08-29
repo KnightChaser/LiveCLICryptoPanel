@@ -100,7 +100,7 @@ while True:
                         changeDirectionArrow = Back.RED + Fore.WHITE + "▲" + ")" + Style.RESET_ALL
                     elif float(changePercent24Hr) < 0:                                                                          # DOWN
                         changePercent24Hr = Back.BLUE + Fore.WHITE + "(" + str(changePercent24Hr)  + " % " + Style.RESET_ALL
-                        changeDirectionArrow = Back.BLUE + Fore.WHITE + "▲" + ")" + Style.RESET_ALL
+                        changeDirectionArrow = Back.BLUE + Fore.WHITE + "▼" + ")" + Style.RESET_ALL
                     else:                                                                                                       # Steady (0% change rate recorded)
                         changePercent24Hr = Back.BLACK + Fore.WHITE + "(" + str(changePercent24Hr) + " % " + Style.RESET_ALL
                         changeDirectionArrow = Back.BLACK + Fore.WHITE + "■" + ")" + Style.RESET_ALL
