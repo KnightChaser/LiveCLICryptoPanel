@@ -169,7 +169,7 @@ def runProgram():
         if apiCallFailedCount == 0 and exceptionCount == 0:
             uptimeRatio = 100
         else:
-            uptimeRatio = "{:.2f}".format((updateCycleCount * 100) / (apiCallFailedCount + exceptionCount))
+            uptimeRatio = "{:.2f}".format((updateCycleCount * 100) / (updateCycleCount + apiCallFailedCount + exceptionCount))
         
         # runtime log
         print("")
