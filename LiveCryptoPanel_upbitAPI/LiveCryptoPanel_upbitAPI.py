@@ -22,7 +22,8 @@ def createQueryURL():
     APIqueryURL = "https://api.upbit.com/v1/ticker?markets="
 
     for sequence in upbitCryptoMarketCode:
-        if "KRW-" in sequence["market"]:
+        # we won't support USDT market because its trading volume is too small
+        if "KRW-" in sequence["market"] or "BTC-" in sequence["market"] :
             APIqueryURL += sequence["market"] 
             APIqueryURL += ","
 
@@ -30,7 +31,6 @@ def createQueryURL():
     APIqueryURL = APIqueryURL[:-1]
     
     return APIqueryURL
-
 
 # gather necessary information
 def gatherInformation(APIqueryURL):
@@ -51,10 +51,9 @@ def gatherInformation(APIqueryURL):
         return cryptoDataBundle
     except:
         return "JSONDecodeErrorAtGatheringInformation"
-    
 
 
-def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriteria):
+def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriterion):
 
     cryptoDataBundle = gatherInformation(APIqueryURL)
 
@@ -66,28 +65,54 @@ def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriteria):
     elif cryptoDataBundle == "JSONDecodeErrorAtGatheringInformation":
         return "JSONDecodeErrorAtGatheringInformation"
 
+    # for BTC market
+    currentBTCprice = float(round(cryptoDataBundle[0]["trade_price"]))          # <-- Its orginal value type was <class='str'>
+
+    # sort data(dictionary in list) as descending order according to the 24h trade volume
+    # Do completion enumeration and convert BTC market coin into KRW currency
+    for sequence in range(len(cryptoDataBundle)):
+        if "BTC-" in cryptoDataBundle[sequence]["market"]:
+            cryptoDataBundle[sequence]["acc_trade_price_24h"] *= currentBTCprice
+
+    # Sort data as criteria with KRW value.
+    cryptoDataBundle = sorted(cryptoDataBundle, key = lambda x:x[dataSortCriterion], reverse = True)
+
     try:
-        # sort data(dictionary in list) as descending order according to the 24h trade volume
-        # cryptoDataBundle = sorted(cryptoDataBundle, key = lambda x:x["acc_trade_price_24h"], reverse = True)
-        cryptoDataBundle = sorted(cryptoDataBundle, key = lambda x:x[dataSortCriteria], reverse = True)
+
 
         os.system("cls")
 
-        print(" 종목         가격           변동량(변동률)         24시간 고가      24시간 저가                    24시간 거래량")
-        print("=============================================================================================================================================")
+        print("  종목    마켓         가격           변동량(변동률)          24시간 고가      24시간 저가                    24시간 거래량")
+        print("==================================================================================================================================================")
 
         #for sequence in range(len(cryptoDataBundle)):          # if you want to show everything..
         for sequence in range(cryptoShowQuantity):   
             symbol = cryptoDataBundle[sequence]["market"][4:]           # ex) KRW-BTC   ---> BTC
-            currentPrice = "{:,}".format(round(cryptoDataBundle[sequence]["trade_price"]))
-            highPrice = "{:,}".format(round(cryptoDataBundle[sequence]["high_price"]))
-            lowPrice = "{:,}".format(round(cryptoDataBundle[sequence]["low_price"]))
-            changePrice = "{:,}".format(round(cryptoDataBundle[sequence]["signed_change_price"]))
-            realChangeRate = cryptoDataBundle[sequence]["signed_change_rate"]               # accurate change rate. no ceiling. to decide if crypto went up or down or even.
-            changeRate = "{:.3f}".format(cryptoDataBundle[sequence]["signed_change_rate"])
-            accumulatedTradePrice24hr = "{:,}".format(round(cryptoDataBundle[sequence]["acc_trade_price_24h"]))
+            
+            # No relationship between whether current market is BTC-related or KRW-related
+            changeRate = "{:.3f}".format(cryptoDataBundle[sequence]["signed_change_rate"] * 100)
+            realChangeRate = cryptoDataBundle[sequence]["signed_change_rate"]              # accurate change rate. no ceiling. to decide if crypto went up or down or even.
             accumulatedTradeVolume24hr = "{:,.2f}".format(round(cryptoDataBundle[sequence]["acc_trade_volume_24h"], 2))
 
+            # if we're seeking BTC market
+            if "BTC-" in cryptoDataBundle[sequence]["market"]:
+                currentPrice = "{:,}".format(round(cryptoDataBundle[sequence]["trade_price"] * currentBTCprice))
+                highPrice = "{:,}".format(round(cryptoDataBundle[sequence]["high_price"] * currentBTCprice))
+                lowPrice = "{:,}".format(round(cryptoDataBundle[sequence]["low_price"] * currentBTCprice))
+                changePrice = "{:,}".format(round(cryptoDataBundle[sequence]["signed_change_price"] * currentBTCprice))
+                accumulatedTradePrice24hr = "{:,}".format(round(cryptoDataBundle[sequence]["acc_trade_price_24h"]))     # it's already multiplied
+                marketType = "BTC"
+
+            # or, if we're seeking KRW market
+            elif "KRW-" in cryptoDataBundle[sequence]["market"]:
+                currentPrice = "{:,}".format(round(cryptoDataBundle[sequence]["trade_price"]))
+                highPrice = "{:,}".format(round(cryptoDataBundle[sequence]["high_price"]))
+                lowPrice = "{:,}".format(round(cryptoDataBundle[sequence]["low_price"]))
+                changePrice = "{:,}".format(round(cryptoDataBundle[sequence]["signed_change_price"]))
+                accumulatedTradePrice24hr = "{:,}".format(round(cryptoDataBundle[sequence]["acc_trade_price_24h"]))
+                marketType = "KRW"
+                
+            
 
             if realChangeRate > 0:            # price went up
                 changePrice = Fore.RED + str(changePrice) + " " + Style.RESET_ALL
@@ -103,13 +128,15 @@ def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriteria):
                 changeArrow = Fore.WHITE + "■" + Style.RESET_ALL
 
             # print information!
-            print("{0:^6} | ₩ {1:>11} ( {2:>20}~{3:>17} {4}) | ₩ {5:>11} | ₩ {6:>11} | ₩ {7:>19} ( ≈{8:>20} {9:^5}) ".
-                format(symbol, currentPrice, changePrice, changeRate, changeArrow, highPrice, lowPrice,
+            print("{0:^7} | {1} | ₩ {2:>11} ( {3:>20}~{4:>18} {5}) | ₩ {6:>11} | ₩ {7:>11} | ₩ {8:>19} ( ≈{9:>20} {10:^7}) ".
+                format(symbol, marketType, currentPrice, changePrice, changeRate, changeArrow, highPrice, lowPrice,
                 accumulatedTradePrice24hr, accumulatedTradeVolume24hr, symbol))
     except:
         return "unexpectedErrorAtCryptoDataProcessing"
 
     return "successfulProcessing"
+
+
 
 def runProgram():
 
@@ -144,68 +171,56 @@ def runProgram():
                            6 : "acc_trade_price_24h"
                             }
 
-    dataSortCriteria = supportedSelection[dataSortCriterionNumber]
+    dataSortCriterion = supportedSelection[dataSortCriterionNumber]
 
     #######################################################################################################################
 
     APIqueryURL = createQueryURL()
 
     while True:
-        # os.system("cls")                      # <-- to reduce void screen time, I inserted this into function cryptoDataProcessing()
-        now = datetime.datetime.now()
-
-        # run!
-        runtimeResult = cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriteria)
         
-        # runtime procedure verification
-        if runtimeResult == "successfulProcessing":
-            updateCycleCount += 1
-        elif runtimeResult == "APIqueryURLFailed":
-            apiCallFailedCount += 1
-            print("API call creation failed. Retry in 2 seconds. | API 요청 제작 실패. 2초 내 재시도합니다.")
-        elif runtimeResult == "UnexpectedErrorAtGatheringInformation":
-            exceptionCount += 1
-            print("Unexpected error occured at gathering information. Retry in 2 seconds. | 데이터 수집중 예상치 못한 오류 발생. 2초 내 재시도합니다.")
-        elif runtimeResult == "unexpectedErrorAtCryptoDataProcessing":
-            exceptionCount += 1
-            print("Unexpected error occured at data processing. Retry in 2 seconds. | 데이터 처리중 예상치 못한 오류 발생. 2초 내 재시도합니다.")
+            # os.system("cls")                      # <-- to reduce void screen time, I inserted this into function cryptoDataProcessing()
+            now = datetime.datetime.now()
 
-        if apiCallFailedCount == 0 and exceptionCount == 0:
-            uptimeRatio = 100
-        else:
-            uptimeRatio = "{:.2f}".format((updateCycleCount * 100) / (updateCycleCount + apiCallFailedCount + exceptionCount))
-        
-        # runtime log
-        print("")
-        print("============================================================================================================================================")
-        print("업데이트 시각 : {} | 업데이트 횟수 : {} 회 | API Call 실패 : {} 회 | 기타 에러 : {} 회 | Uptime 비율 : {} % "
-                    .format(now.strftime('%Y년 %m월 %d일 %H시 %M분 %S초'), updateCycleCount, apiCallFailedCount, exceptionCount, uptimeRatio))
-        print("============================================================================================================================================")
-        print("powered by UPBIT. created by LUMINOUS(blog.naver.com/agerio100 | agerio100@naver.com)")
+            # run!
+            runtimeResult = cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriterion)
 
-        # if everything went successfully
-        if runtimeResult == "successfulProcessing":
-            updateCycleCount += 1
-            # wait for designated refresh interval
-            sleep(refreshInterval)
-
-        else:
-            # runtime procedure verification
-            if runtimeResult == "APIqueryURLFailed":
-                apiCallFailedCount += 1
-                print("API call creation failed. Retry in 2 seconds. | API 요청 제작 실패. 2초 내 재시도합니다.")
-            elif runtimeResult == "UnexpectedErrorAtGatheringInformation":
-                exceptionCount += 1
-                print("Unexpected error occured at gathering information. Retry in 2 seconds. | 데이터 수집중 예상치 못한 오류 발생. 2초 내 재시도합니다.")
-            elif runtimeResult == "unexpectedErrorAtCryptoDataProcessing":
-                exceptionCount += 1
-                print("Unexpected error occured at data processing. Retry in 2 seconds. | 데이터 처리중 예상치 못한 오류 발생. 2초 내 재시도합니다.")
-            elif runtimeResult == "JSONDecodeErrorAtGatheringInformation":
-                exceptionCount += 1
-                print("JSON Decode exception at data processing. Retry in 2 seconds. | JSON 형태의 데이터를 디코딩하는 중 예외상황발생. 2초 내 재시도합니다.")
+            if apiCallFailedCount == 0 and exceptionCount == 0:
+                uptimeRatio = 100
+            else:
+                uptimeRatio = "{:.2f}".format((updateCycleCount * 100) / (updateCycleCount + apiCallFailedCount + exceptionCount))
             
-            # to be fast
-            sleep(1)
+            # runtime log
+            print("")
+            print("=================================================================================================================================================")
+            print("업데이트 시각 : {} | 업데이트 횟수 : {} 회 | API Call 실패 : {} 회 | 기타 에러 : {} 회 | Uptime 비율 : {} % "
+                        .format(now.strftime('%Y년 %m월 %d일 %H시 %M분 %S초'), updateCycleCount, apiCallFailedCount, exceptionCount, uptimeRatio))
+            print("=================================================================================================================================================")
+            print("powered by UPBIT. created by LUMINOUS(blog.naver.com/agerio100 | agerio100@naver.com)")
+
+            # if everything went successfully
+            if runtimeResult == "successfulProcessing":
+                updateCycleCount += 1
+                # wait for designated refresh interval
+                sleep(refreshInterval)
+
+            else:
+                # runtime procedure verification
+                if runtimeResult == "APIqueryURLFailed":
+                    apiCallFailedCount += 1
+                    print("API call creation failed. Retry in 2 seconds. | API 요청 제작 실패. 2초 내 재시도합니다.")
+                elif runtimeResult == "UnexpectedErrorAtGatheringInformation":
+                    exceptionCount += 1
+                    print("Unexpected error occured at gathering information. Retry in 2 seconds. | 데이터 수집중 예상치 못한 오류 발생. 2초 내 재시도합니다.")
+                elif runtimeResult == "unexpectedErrorAtCryptoDataProcessing":
+                    exceptionCount += 1
+                    print("Unexpected error occured at data processing. Retry in 2 seconds. | 데이터 처리중 예상치 못한 오류 발생. 2초 내 재시도합니다.")
+                elif runtimeResult == "JSONDecodeErrorAtGatheringInformation":
+                    exceptionCount += 1
+                    print("JSON Decode exception at data processing. Retry in 2 seconds. | JSON 형태의 데이터를 디코딩하는 중 예외상황발생. 2초 내 재시도합니다.")
+                
+                # to be fast
+                sleep(1)
         
 
 
