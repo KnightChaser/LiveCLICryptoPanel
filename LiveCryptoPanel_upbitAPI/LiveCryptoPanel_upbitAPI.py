@@ -46,10 +46,12 @@ def gatherInformation(APIqueryURL):
         # unexpected error occured
         return "UnexpectedErrorAtGatheringInformation"
 
-    cryptoDataBundle = json.loads(responseCryptoAPI.text)
-
-    # print(cryptoDataBundle[0]["market"])
-    return cryptoDataBundle
+    try:
+        cryptoDataBundle = json.loads(responseCryptoAPI.text)
+        return cryptoDataBundle
+    except:
+        return "JSONDecodeErrorAtGatheringInformation"
+    
 
 
 def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriteria):
@@ -61,6 +63,8 @@ def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriteria):
         return "APIqueryURLFailed"
     elif cryptoDataBundle == "UnexpectedErrorAtGatheringInformation":
         return "UnexpectedErrorAtGatheringInformation"
+    elif cryptoDataBundle == "JSONDecodeErrorAtGatheringInformation":
+        return "JSONDecodeErrorAtGatheringInformation"
 
     try:
         # sort data(dictionary in list) as descending order according to the 24h trade volume
@@ -179,8 +183,31 @@ def runProgram():
         print("============================================================================================================================================")
         print("powered by UPBIT. created by LUMINOUS(blog.naver.com/agerio100 | agerio100@naver.com)")
 
-        # wait for designated refresh interval
-        sleep(refreshInterval)
+        # if everything went successfully
+        if runtimeResult == "successfulProcessing":
+            updateCycleCount += 1
+            # wait for designated refresh interval
+            sleep(refreshInterval)
+
+        else:
+            # runtime procedure verification
+            if runtimeResult == "APIqueryURLFailed":
+                apiCallFailedCount += 1
+                print("API call creation failed. Retry in 2 seconds. | API 요청 제작 실패. 2초 내 재시도합니다.")
+            elif runtimeResult == "UnexpectedErrorAtGatheringInformation":
+                exceptionCount += 1
+                print("Unexpected error occured at gathering information. Retry in 2 seconds. | 데이터 수집중 예상치 못한 오류 발생. 2초 내 재시도합니다.")
+            elif runtimeResult == "unexpectedErrorAtCryptoDataProcessing":
+                exceptionCount += 1
+                print("Unexpected error occured at data processing. Retry in 2 seconds. | 데이터 처리중 예상치 못한 오류 발생. 2초 내 재시도합니다.")
+            elif runtimeResult == "JSONDecodeErrorAtGatheringInformation":
+                exceptionCount += 1
+                print("JSON Decode exception at data processing. Retry in 2 seconds. | JSON 형태의 데이터를 디코딩하는 중 예외상황발생. 2초 내 재시도합니다.")
+            
+            # to be fast
+            sleep(1)
+        
+
 
 
 if __name__ == "__main__":
