@@ -52,7 +52,7 @@ def gatherInformation(APIqueryURL):
     return cryptoDataBundle
 
 
-def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity):
+def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriteria):
 
     cryptoDataBundle = gatherInformation(APIqueryURL)
 
@@ -64,7 +64,8 @@ def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity):
 
     try:
         # sort data(dictionary in list) as descending order according to the 24h trade volume
-        cryptoDataBundle = sorted(cryptoDataBundle, key = lambda x:x["acc_trade_price_24h"], reverse = True)
+        # cryptoDataBundle = sorted(cryptoDataBundle, key = lambda x:x["acc_trade_price_24h"], reverse = True)
+        cryptoDataBundle = sorted(cryptoDataBundle, key = lambda x:x[dataSortCriteria], reverse = True)
 
         os.system("cls")
 
@@ -116,10 +117,32 @@ def runProgram():
     exceptionCount = 0
     uptimeRatio = 0
 
+    ####################################### user preference selection ####################################################
+
     print("*Note : It is shown as the descending order of market cap. | *참고 : 시가총액 기준 내림차순 순서대로 보여집니다.")
     cryptoShowQuantity = int(input("How many cryptos to livestream? [1~75] : "))
     if cryptoShowQuantity < 1 or cryptoShowQuantity > 75:
         sys.exit("Check your quantity input and try again. It's wrong input.")
+    os.system("cls")
+
+    print("""*[1 : 가격(selection)] / [2 : 변동량(Change quantity)] / [3 : 변동률(Change rate)] /
+        [4 : 24시간 고가(24hr high price)] / [5 : 24시간 저가(24hr low price)] / [6 : 24시간 거래량(24hr trade volume)] """)
+    dataSortCriterionNumber = int(input("By what criteria would you like to sort your data? : "))
+    if dataSortCriterionNumber < 1 or dataSortCriterionNumber > 6:
+        sys.exit("Check your selection and try again. It's wrong input.")
+    os.system("cls")
+
+    supportedSelection = { 1 : "trade_price",
+                           2 : "signed_change_price",
+                           3 : "signed_change_rate",
+                           4 : "high_price",
+                           5 : "low_price",
+                           6 : "acc_trade_price_24h"
+                            }
+
+    dataSortCriteria = supportedSelection[dataSortCriterionNumber]
+
+    #######################################################################################################################
 
     APIqueryURL = createQueryURL()
 
@@ -128,7 +151,7 @@ def runProgram():
         now = datetime.datetime.now()
 
         # run!
-        runtimeResult = cryptoDataProcessing(APIqueryURL, cryptoShowQuantity)
+        runtimeResult = cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriteria)
         
         # runtime procedure verification
         if runtimeResult == "successfulProcessing":
