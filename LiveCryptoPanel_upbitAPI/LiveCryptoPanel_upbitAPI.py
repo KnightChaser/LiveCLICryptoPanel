@@ -132,7 +132,6 @@ def runProgram():
         now = datetime.datetime.now()
 
         # run!
-        runtimeResult = cryptoDataProcessing(APIqueryURL, cryptoShowQuantity)
 
         if apiCallFailedCount == 0 and exceptionCount == 0:
             uptimeRatio = 100
