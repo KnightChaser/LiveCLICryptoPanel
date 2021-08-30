@@ -8,7 +8,7 @@ API가 다른 경우 아예 디렉터리를 분류해놓았습니다.
 
 현재 파일들)
 
-```LiveCryptoPanel_upbitAPI```  
+```LiveCLICryptoPanel_upbitAPI```  
  - **2번째 작업물**
  - Upbit API 사용  
  - 2초에 한번씩 업데이트(기본값)
@@ -17,7 +17,7 @@ API가 다른 경우 아예 디렉터리를 분류해놓았습니다.
  - 유동 거래량
  - **제공 정보 : 암호화폐 종목, 마켓, 가격, 변동량과 변동률, 24시간 고가, 24시간 저가, 24시간 거래량(KRW, crypto)**
 
-```LiveCryptoPanel_coincapAPI```  
+```LiveCLICryptoPanel_coincapAPI```  
  - **1번째 작업물**
  - 무료로 제공되는 해외 Coincap API 사용
  - 대략 15초에 한번씩 업데이트(기본값)
