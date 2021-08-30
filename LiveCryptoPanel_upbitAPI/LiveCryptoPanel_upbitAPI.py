@@ -65,6 +65,10 @@ def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriterion):
     elif cryptoDataBundle == "JSONDecodeErrorAtGatheringInformation":
         return "JSONDecodeErrorAtGatheringInformation"
 
+    # how much money have traded in recent 24 hour?
+    totalUPBITKRWMarketTradePrice24hr = 0               # KRW Market
+    totalUPBITBTCMarketTradePrice24hr = 0               # BTC Market
+
     # for BTC market
     currentBTCprice = float(round(cryptoDataBundle[0]["trade_price"]))          # <-- Its orginal value type was <class='str'>
 
@@ -73,6 +77,9 @@ def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriterion):
     for sequence in range(len(cryptoDataBundle)):
         if "BTC-" in cryptoDataBundle[sequence]["market"]:
             cryptoDataBundle[sequence]["acc_trade_price_24h"] *= currentBTCprice
+            totalUPBITBTCMarketTradePrice24hr += cryptoDataBundle[sequence]["acc_trade_price_24h"]
+        else:
+            totalUPBITKRWMarketTradePrice24hr += cryptoDataBundle[sequence]["acc_trade_price_24h"]
 
     # Sort data as criteria with KRW value.
     cryptoDataBundle = sorted(cryptoDataBundle, key = lambda x:x[dataSortCriterion], reverse = True)
@@ -82,8 +89,8 @@ def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriterion):
 
         os.system("cls")
 
-        print("  종목    마켓         가격           변동량(변동률)          24시간 고가      24시간 저가                    24시간 거래량")
-        print("==================================================================================================================================================")
+        print("  종목    마켓         가격           변동량(변동률)        24시간 고가     24시간 저가                    24시간 거래량")
+        print("=================================================================================================================================================")
 
         #for sequence in range(len(cryptoDataBundle)):          # if you want to show everything..
         for sequence in range(cryptoShowQuantity):   
@@ -131,8 +138,16 @@ def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriterion):
             print("{0:^7} | {1} | ₩ {2:>11} ( {3:>20}~{4:>18} {5}) | ₩ {6:>11} | ₩ {7:>11} | ₩ {8:>19} ( ≈{9:>20} {10:^7}) ".
                 format(symbol, marketType, currentPrice, changePrice, changeRate, changeArrow, highPrice, lowPrice,
                 accumulatedTradePrice24hr, accumulatedTradeVolume24hr, symbol))
+
+        print("")
+        exchangeTradingVolumeNotificationMessage = Back.CYAN + Fore.WHITE + Style.BRIGHT + "[UPBIT 최근 24시간 거래량] KRW마켓 ≈ ₩ {:,} | BTC마켓 ≈ ₩ {:,} | 합산 ≈ ₩ {:,}".format(
+                    round(totalUPBITKRWMarketTradePrice24hr), round(totalUPBITBTCMarketTradePrice24hr),
+                    round(totalUPBITKRWMarketTradePrice24hr + totalUPBITBTCMarketTradePrice24hr)) + Style.RESET_ALL
+        print(exchangeTradingVolumeNotificationMessage)
+
     except:
         return "unexpectedErrorAtCryptoDataProcessing"
+
 
     return "successfulProcessing"
 
@@ -191,9 +206,8 @@ def runProgram():
                 uptimeRatio = "{:.2f}".format((updateCycleCount * 100) / (updateCycleCount + apiCallFailedCount + exceptionCount))
             
             # runtime log
-            print("")
             print("=================================================================================================================================================")
-            print("업데이트 시각 : {} | 업데이트 횟수 : {} 회 | API Call 실패 : {} 회 | 기타 에러 : {} 회 | Uptime 비율 : {} % "
+            print("업데이트 시각 : {} | 업데이트 횟수 : {:,} 회 | API Call 실패 : {:,} 회 | 기타 에러 : {:,} 회 | Uptime 비율 : {} % "
                         .format(now.strftime('%Y년 %m월 %d일 %H시 %M분 %S초'), updateCycleCount, apiCallFailedCount, exceptionCount, uptimeRatio))
             print("=================================================================================================================================================")
             print("powered by UPBIT. created by LUMINOUS(blog.naver.com/agerio100 | agerio100@naver.com)")
