@@ -92,7 +92,7 @@ def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriterion, sor
 
         os.system("cls")
 
-        print("  종목    마켓         가격           변동량(변동률)        24시간 고가     24시간 저가                    24시간 거래량")
+        print("  종목    마켓       가격             변동량(변동률)        24시간 고가      24시간 저가                    24시간 거래량")
         print("=================================================================================================================================================")
 
         #for sequence in range(len(cryptoDataBundle)):          # if you want to show everything..
@@ -125,20 +125,20 @@ def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriterion, sor
             
 
             if realChangeRate > 0:            # price went up
-                changePrice = Fore.RED + str(changePrice) + " " + Style.RESET_ALL
-                changeRate = Fore.RED + str(changeRate) + "%" + Style.RESET_ALL
-                changeArrow = Fore.RED + "▲" + Style.RESET_ALL
+                changePrice = Fore.RED + Style.BRIGHT + str(changePrice) + " " + Style.RESET_ALL
+                changeRate = Fore.RED + Style.BRIGHT + str(changeRate) + "%" + Style.RESET_ALL
+                changeArrow = Fore.RED + Style.BRIGHT + "▲" + Style.RESET_ALL
             elif realChangeRate < 0:          # price went down
-                changePrice = Fore.BLUE + str(changePrice) + " " + Style.RESET_ALL
-                changeRate = Fore.BLUE + str(changeRate) + "%" + Style.RESET_ALL
-                changeArrow = Fore.BLUE + "▼" + Style.RESET_ALL
+                changePrice = Fore.BLUE + Style.BRIGHT + str(changePrice) + " " + Style.RESET_ALL
+                changeRate = Fore.BLUE + Style.BRIGHT + str(changeRate) + "%" + Style.RESET_ALL
+                changeArrow = Fore.BLUE + Style.BRIGHT + "▼" + Style.RESET_ALL
             elif realChangeRate == 0:                                  # even
-                changePrice = Fore.WHITE + str(changePrice) + " " + Style.RESET_ALL
-                changeRate = Fore.WHITE + "0.000%" + Style.RESET_ALL
-                changeArrow = Fore.WHITE + "■" + Style.RESET_ALL
+                changePrice = Fore.WHITE + Style.BRIGHT + str(changePrice) + " " + Style.RESET_ALL
+                changeRate = Fore.WHITE + Style.BRIGHT + "0.000%" + Style.RESET_ALL
+                changeArrow = Fore.WHITE + Style.BRIGHT + "■" + Style.RESET_ALL
 
             # print information!
-            print("{0:^7} | {1} | ₩ {2:>11} ( {3:>20}~{4:>18} {5}) | ₩ {6:>11} | ₩ {7:>11} | ₩ {8:>19} ( ≈{9:>20} {10:^7}) ".
+            print("{0:^7} | {1} | ₩ {2:>11} ( {3:>23}~{4:>23} {5}) | ₩ {6:>11} | ₩ {7:>11} | ₩ {8:>19} ( ≈{9:>20} {10:^7}) ".
                 format(symbol, marketType, currentPrice, changePrice, changeRate, changeArrow, highPrice, lowPrice,
                 accumulatedTradePrice24hr, accumulatedTradeVolume24hr, symbol))
 
