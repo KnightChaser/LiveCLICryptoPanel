@@ -58,12 +58,8 @@ def cryptoDataProcessing(APIqueryURL, cryptoShowQuantity, dataSortCriterion, sor
     cryptoDataBundle = gatherInformation(APIqueryURL)
 
     # error handling
-    if cryptoDataBundle == "APIqueryURLFailed":
-        return "APIqueryURLFailed"
-    elif cryptoDataBundle == "UnexpectedErrorAtGatheringInformation":
-        return "UnexpectedErrorAtGatheringInformation"
-    elif cryptoDataBundle == "JSONDecodeErrorAtGatheringInformation":
-        return "JSONDecodeErrorAtGatheringInformation"
+    if cryptoDataBundle in ["APIqueryURLFailed", "UnexpectedErrorAtGatheringInformation", "JSONDecodeErrorAtGatheringInformation"]:
+        return cryptoDataBundle
 
     # how much money have traded in recent 24 hour?
     totalUPBITKRWMarketTradePrice24hr = 0               # KRW Market
@@ -235,15 +231,15 @@ def runProgram():
                     print("API call creation failed. Retry in 2 seconds. | API 요청 제작 실패. 2초 내 재시도합니다.")
                 elif runtimeResult == "UnexpectedErrorAtGatheringInformation":
                     exceptionCount += 1
-                    print("Unexpected error occured at gathering information. Retry in 2 seconds. | 데이터 수집중 예상치 못한 오류 발생. 2초 내 재시도합니다.")
+                    print("Unexpected error occured at gathering information. Retry in 2 seconds. | 데이터 수집중 예상치 못한 오류 발생. 1초 내 재시도합니다.")
                 elif runtimeResult == "unexpectedErrorAtCryptoDataProcessing":
                     exceptionCount += 1
-                    print("Unexpected error occured at data processing. Retry in 2 seconds. | 데이터 처리중 예상치 못한 오류 발생. 2초 내 재시도합니다.")
+                    print("Unexpected error occured at data processing. Retry in 2 seconds. | 데이터 처리중 예상치 못한 오류 발생. 1초 내 재시도합니다.")
                 elif runtimeResult == "JSONDecodeErrorAtGatheringInformation":
                     exceptionCount += 1
-                    print("JSON Decode exception at data processing. Retry in 2 seconds. | JSON 형태의 데이터를 디코딩하는 중 예외상황발생. 2초 내 재시도합니다.")
+                    print("JSON Decode exception at data processing. Retry in 2 seconds. | JSON 형태의 데이터를 디코딩하는 중 예외상황발생. 1초 내 재시도합니다.")
                 
-                # to be fast
+                # to execute fast recovery...
                 sleep(1)
         
 
