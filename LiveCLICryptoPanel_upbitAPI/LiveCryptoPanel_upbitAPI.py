@@ -63,10 +63,6 @@ def cryptoDataProcessing(cryptoDataBundle, dataSortCriterion, sortDirection):
     totalUPBITKRWMarketTradePrice24hr = 0               # KRW Market
     totalUPBITBTCMarketTradePrice24hr = 0               # BTC Market
 
-    # Add extra arrow direction to express whether price went up or down than last update value
-    # store exactly-recent data
-    previousCryptoKRWprice = {"init" : -1}
-
     # for BTC market
     currentBTCprice = float(round(cryptoDataBundle[0]["trade_price"]))          # <-- Its orginal value type was <class='str'>
 
@@ -76,10 +72,10 @@ def cryptoDataProcessing(cryptoDataBundle, dataSortCriterion, sortDirection):
         if "BTC-" in cryptoDataBundle[sequence]["market"]:
             cryptoDataBundle[sequence]["acc_trade_price_24h"] *= currentBTCprice
             totalUPBITBTCMarketTradePrice24hr += cryptoDataBundle[sequence]["acc_trade_price_24h"]
-            previousCryptoKRWprice[cryptoDataBundle[sequence]["market"]] = cryptoDataBundle[sequence]["acc_trade_price_24h"]  # store price data
+            # previousCryptoKRWprice[cryptoDataBundle[sequence]["market"]] = cryptoDataBundle[sequence]["acc_trade_price_24h"]  # store price data
         else:
             totalUPBITKRWMarketTradePrice24hr += cryptoDataBundle[sequence]["acc_trade_price_24h"]
-            previousCryptoKRWprice[cryptoDataBundle[sequence]["market"]] = cryptoDataBundle[sequence]["acc_trade_price_24h"]  # store price data
+            # previousCryptoKRWprice[cryptoDataBundle[sequence]["market"]] = cryptoDataBundle[sequence]["acc_trade_price_24h"]  # store price data
 
     # Sort data as criteria with KRW value.
     if sortDirection == 2:              # descending order
@@ -87,23 +83,22 @@ def cryptoDataProcessing(cryptoDataBundle, dataSortCriterion, sortDirection):
     else:
         cryptoDataBundle = sorted(cryptoDataBundle, key = lambda x:x[dataSortCriterion], reverse = False)
 
-    # return "DataProcessingSuccessful", cryptoDataBundle, previousCryptoKRWprice, totalUPBITKRWMarketTradePrice24hr, totalUPBITBTCMarketTradePrice24hr
     return "DataProcessingSuccessful", cryptoDataBundle, totalUPBITKRWMarketTradePrice24hr, totalUPBITBTCMarketTradePrice24hr, currentBTCprice
+    # return "DataProcessingSuccessful", cryptoDataBundle, totalUPBITKRWMarketTradePrice24hr, totalUPBITBTCMarketTradePrice24hr, currentBTCprice
 
 
-def cryptoDataPrinting(cryptoDataBundle, cryptoShowQuantity, totalUPBITKRWMarketTradePrice24hr, 
-                        totalUPBITBTCMarketTradePrice24hr, currentBTCprice):
+def cryptoDataPrinting(cryptoDataBundle, previousCryptoValueChange, cryptoShowQuantity, totalUPBITKRWMarketTradePrice24hr, totalUPBITBTCMarketTradePrice24hr, currentBTCprice):
 
     try:
-        pass
 
         os.system("cls")
 
-        print("  종목    마켓       가격             변동량(변동률)        24시간 고가      24시간 저가                    24시간 거래량")
-        print("=================================================================================================================================================")
+        print("  종목    마켓       가격                변동량(변동률)              24시간 고가      24시간 저가                    24시간 거래량")
+        print("==========================================================================================================================================================")
 
         #for sequence in range(len(cryptoDataBundle)):          # if you want to show everything..
         for sequence in range(cryptoShowQuantity):   
+            market = cryptoDataBundle[sequence]["market"]
             symbol = cryptoDataBundle[sequence]["market"][4:]           # ex) KRW-BTC   ---> BTC
             
             # No relationship between whether current market is BTC-related or KRW-related
@@ -128,6 +123,7 @@ def cryptoDataPrinting(cryptoDataBundle, cryptoShowQuantity, totalUPBITKRWMarket
                 changePrice = "{:,}".format(round(cryptoDataBundle[sequence]["signed_change_price"]))
                 accumulatedTradePrice24hr = "{:,}".format(round(cryptoDataBundle[sequence]["acc_trade_price_24h"]))
                 marketType = "KRW"
+            
 
             if realChangeRate > 0:            # price went up
                 changePrice = Fore.RED + Style.BRIGHT + str(changePrice) + " " + Style.RESET_ALL
@@ -140,36 +136,46 @@ def cryptoDataPrinting(cryptoDataBundle, cryptoShowQuantity, totalUPBITKRWMarket
             elif realChangeRate == 0:                                  # even
                 changePrice = Fore.WHITE + Style.BRIGHT + str(changePrice) + " " + Style.RESET_ALL
                 changeRate = Fore.WHITE + Style.BRIGHT + "0.000%" + Style.RESET_ALL
-                changeArrow = Fore.WHITE + Style.BRIGHT + "■" + Style.RESET_ALL
+                changeArrow = Fore.WHITE + Style.BRIGHT + "~" + Style.RESET_ALL
+
+            # 
+            if cryptoDataBundle[sequence]["market"] not in previousCryptoValueChange:
+                # previousCryptoValueChange = {cryptoDataBundle[sequence]["market"] : realChangeRate}
+                liveCryptoValueChangeDirection = Back.GREEN + Fore.WHITE + Style.BRIGHT + "준비중 ＠" + Style.RESET_ALL
+            else:
+
+                if realChangeRate > previousCryptoValueChange.get(market):        # going up
+                    liveCryptoValueChangeDirection = Back.RED + Fore.WHITE + Style.BRIGHT + "상승세 ↑" + Style.RESET_ALL
+                elif realChangeRate < previousCryptoValueChange.get(market):
+                    liveCryptoValueChangeDirection = Back.BLUE + Fore.WHITE + Style.BRIGHT + "하락세 ↓" + Style.RESET_ALL
+                elif realChangeRate == previousCryptoValueChange.get(market):
+                    liveCryptoValueChangeDirection = Fore.WHITE + Style.BRIGHT + "보합세 ↔" + Style.RESET_ALL
+
 
             # print information!
-            print("{0:^7} | {1} | ₩ {2:>11} ( {3:>23}~{4:>23} {5}) | ₩ {6:>11} | ₩ {7:>11} | ₩ {8:>19} ( ≈{9:>20} {10:^7}) ".
-                format(symbol, marketType, currentPrice, changePrice, changeRate, changeArrow, highPrice, lowPrice,
-                accumulatedTradePrice24hr, accumulatedTradeVolume24hr, symbol))
+            print("{0:^7} | {1} | ₩ {2:>11} ( {3:>23}~{4:>23} {5} {6}) | ₩ {7:>11} | ₩ {8:>11} | ₩ {9:>19} ( ≈{10:>20} {11:^7}) ".
+                format(symbol, marketType, currentPrice, changePrice, changeRate, changeArrow, liveCryptoValueChangeDirection,
+                    highPrice, lowPrice, accumulatedTradePrice24hr, accumulatedTradeVolume24hr, symbol))
+
+            # save previous data
+            previousCryptoValueChange[cryptoDataBundle[sequence]["market"]] = realChangeRate
 
         print("")
         exchangeTradingVolumeNotificationMessage = Back.CYAN + Fore.WHITE + Style.BRIGHT + "[UPBIT 최근 24시간 거래량] KRW마켓 ≈ ₩ {:,} | BTC마켓 ≈ ₩ {:,} | 합산 ≈ ₩ {:,}".format(
                     round(totalUPBITKRWMarketTradePrice24hr), round(totalUPBITBTCMarketTradePrice24hr),
                     round(totalUPBITKRWMarketTradePrice24hr + totalUPBITBTCMarketTradePrice24hr)) + Style.RESET_ALL
+
         print(exchangeTradingVolumeNotificationMessage)
 
     except:
-        return "unexpectedErrorAtCryptoDataProcessing"
+        return "unexpectedErrorAtCryptoDataProcessing", previousCryptoValueChange
 
 
-    return "everythingWasSuccessful"
+    return "everythingWasSuccessful", previousCryptoValueChange
 
 
 
 def runProgram():
-
-    # refresh interval to get and process a new data
-    refreshInterval = 2
-
-    updateCycleCount = 0
-    apiCallFailedCount = 0
-    exceptionCount = 0
-    uptimeRatio = 0
 
     ####################################### user preference selection ####################################################
     os.system("cls")
@@ -203,6 +209,19 @@ def runProgram():
         sys.exit("Check your selection and try again. It's wrong input. | 선택 입력을 확인하신 후 재시도 해 보세요. 잘못된 입력입니다.")
     os.system("cls")
 
+    # refresh interval to get and process a new data
+    refreshInterval = 2
+
+    updateCycleCount = 0
+    apiCallFailedCount = 0
+    exceptionCount = 0
+    uptimeRatio = 0
+
+
+    # Add extra arrow direction to express whether price went up or down than last update value
+    # store exactly-recent data
+    previousCryptoValueChange = {"init" : -1}
+
     #######################################################################################################################
 
     # Initalization essential operation : create API query URL
@@ -222,7 +241,7 @@ def runProgram():
 
             # data printing (do only data processing process was done without any error)
             if FLAG == "DataProcessingSuccessful":
-                FLAG = cryptoDataPrinting(cryptoDataBundle, cryptoShowQuantity, totalUPBITKRWMarketTradePrice24hr, totalUPBITBTCMarketTradePrice24hr, currentBTCprice)
+                FLAG, previousCryptoValueChange = cryptoDataPrinting(cryptoDataBundle, previousCryptoValueChange, cryptoShowQuantity, totalUPBITKRWMarketTradePrice24hr, totalUPBITBTCMarketTradePrice24hr, currentBTCprice)
 
             # if everything went successfully
             if FLAG == "everythingWasSuccessful":
@@ -234,10 +253,10 @@ def runProgram():
                     uptimeRatio = "{:.2f}".format((updateCycleCount * 100) / (updateCycleCount + apiCallFailedCount + exceptionCount))
                 
                 # runtime log
-                print("=================================================================================================================================================")
+                print("==========================================================================================================================================================")
                 print("업데이트 시각 : {} | 업데이트 횟수 : {:,} 회 | API Call 실패 : {:,} 회 | 기타 에러 : {:,} 회 | Uptime 비율 : {} % "
                             .format(now.strftime('%Y년 %m월 %d일 %H시 %M분 %S초'), updateCycleCount, apiCallFailedCount, exceptionCount, uptimeRatio))
-                print("=================================================================================================================================================")
+                print("==========================================================================================================================================================")
                 print("powered by UPBIT. created by LUMINOUS(blog.naver.com/agerio100 | agerio100@naver.com)")
 
                 # wait for designated refresh interval
