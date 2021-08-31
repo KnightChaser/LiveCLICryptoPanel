@@ -169,7 +169,6 @@ def runProgram():
     ####################################### user preference selection ####################################################
     os.system("cls")
 
-    print("*Note : It is shown as the descending order of market cap. | *참고 : 시가총액 기준 내림차순 순서대로 보여집니다.")
     cryptoShowQuantity = int(input("How many cryptos to livestream? | 실시간으로 현황을 보실 종목은 몇 개 입니까? [1~75] : "))
     if cryptoShowQuantity < 1 or cryptoShowQuantity > 75:
         sys.exit("Check your quantity input and try again. It's wrong input. | 수량 입력을 확인하신 후 재시도 해 보세요. 잘못된 입력입니다.")
@@ -187,12 +186,6 @@ def runProgram():
     sortDirection = int(input("Select order direction. | 정렬 기준을 선택하세요.  : "))
     if sortDirection not in [1, 2]:
         sys.exit("Check your selection and try again. It's wrong input. | 선택 입력을 확인하신 후 재시도 해 보세요. 잘못된 입력입니다.")
-    os.system("cls")
-
-    print("*[1 : 오름차순(ascending)] / [2 : 내림차순(descending)]")
-    sortDirection = int(input("Select : "))
-    if sortDirection not in [1, 2]:
-        sys.exit("Check your selection and try again. It's wrong input.")
     os.system("cls")
 
     supportedSelection = { 1 : "trade_price",
