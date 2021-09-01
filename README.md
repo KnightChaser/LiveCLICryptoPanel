@@ -16,6 +16,7 @@ API가 다른 경우 아예 디렉터리를 분류해놓았습니다.
  - 종가, 변동률, 변동량 등으로 정렬 가능
  - 유동 거래량
  - **제공 정보 : 암호화폐 종목, 마켓, 가격, 변동량과 변동률, 24시간 고가, 24시간 저가, 24시간 거래량(KRW, crypto)**
+ - 작동 화면 예시 : ![Running Screenshot](https://github.com/x3onkait/LiveCLICryptoPanel/blob/main/Running%20Screenshot/LiveCLICryptoPanel_upbitAPI/2021-09-01%20162416.png)
 
 ```LiveCLICryptoPanel_coincapAPI```  
  - **1번째 작업물**
@@ -24,6 +25,7 @@ API가 다른 경우 아예 디렉터리를 분류해놓았습니다.
  - API 서비스를 제공하는 서버 능력이 별로 좋지 않아 Uptime 비율이 평균 90% 대에 불과
  - 전세계 거래량/시가총액 등 보다 덜 접하게 되는 정보가 많이 있으며, 전세계적인 자료가 특히 중점적으로 제공됨
  - **제공 정보 : 암호화폐 종목, 현재 가격, 변동률, 24시간 전세계 거래량, 전세계 시가총액, 전세계 암호화폐 공급량 및 공급한도량**
+ - 작동 화면 예시 : ![Running Screenshot](https://github.com/x3onkait/LiveCLICryptoPanel/blob/main/Running%20Screenshot/LiveCLICryptoPanel_coincapAPI/2021-09-01%20162622.png)
 
 API마다 지원하는 정보, rate limit, API를 제공하는 서버의 수용능력 등에 따라  
 프로그램의 performance, preference 등이 다릅니다.  
