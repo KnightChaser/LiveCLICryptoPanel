@@ -84,7 +84,6 @@ def cryptoDataProcessing(cryptoDataBundle, dataSortCriterion, sortDirection):
         cryptoDataBundle = sorted(cryptoDataBundle, key = lambda x:x[dataSortCriterion], reverse = False)
 
     return "DataProcessingSuccessful", cryptoDataBundle, totalUPBITKRWMarketTradePrice24hr, totalUPBITBTCMarketTradePrice24hr, currentBTCprice
-    # return "DataProcessingSuccessful", cryptoDataBundle, totalUPBITKRWMarketTradePrice24hr, totalUPBITBTCMarketTradePrice24hr, currentBTCprice
 
 
 def cryptoDataPrinting(cryptoDataBundle, previousCryptoValueChange, cryptoShowQuantity, totalUPBITKRWMarketTradePrice24hr, totalUPBITBTCMarketTradePrice24hr, currentBTCprice):
