@@ -1,10 +1,11 @@
-from colorama.ansi import Back, Fore, Style
-import requests
-import json
-import datetime
-from time import sleep
-import os
-import sys
+from colorama.ansi import Back, Fore, Style     # colorize to emphasize and highlight the important information
+import requests                                 # getting information from UPBIT API
+import json                                     # process raw data from UPBIT API which consisted of JSON data
+import datetime                                 # print updating time
+from time import sleep                          # set updating period
+import os                                       # to command operating system command
+import sys                                      # to terminate program
+import timeit                                   # to measure program performance (every procedure)
 
 # create upbit API query URL according to current market code
 def createQueryURL():
@@ -227,6 +228,8 @@ def runProgram():
     APIqueryURL = createQueryURL()
 
     while True:
+
+            startPerformanceMeasurement = timeit.default_timer()
         
             # os.system("cls")                      # <-- to reduce void screen time, I inserted this into function cryptoDataProcessing()
             now = datetime.datetime.now()
@@ -250,11 +253,14 @@ def runProgram():
                     uptimeRatio = 100
                 else:
                     uptimeRatio = "{:.2f}".format((updateCycleCount * 100) / (updateCycleCount + apiCallFailedCount + exceptionCount))
+
+                finishPerformanceMeasurement = timeit.default_timer()
                 
                 # runtime log
                 print("==========================================================================================================================================================")
-                print("업데이트 시각 : {} | 업데이트 횟수 : {:,} 회 | API Call 실패 : {:,} 회 | 기타 에러 : {:,} 회 | Uptime 비율 : {} % "
-                            .format(now.strftime('%Y년 %m월 %d일 %H시 %M분 %S초'), updateCycleCount, apiCallFailedCount, exceptionCount, uptimeRatio))
+                print("업데이트 시각 : {} | 업데이트 횟수 : {:,} 회 | API Call 실패 : {:,} 회 | 기타 에러 : {:,} 회 | Uptime 비율 : {} % | {:.3f} sec/process"
+                            .format(now.strftime('%Y년 %m월 %d일 %H시 %M분 %S초'), updateCycleCount, apiCallFailedCount, exceptionCount, uptimeRatio,
+                                    finishPerformanceMeasurement - startPerformanceMeasurement))
                 print("==========================================================================================================================================================")
                 print("powered by UPBIT. created by LUMINOUS(blog.naver.com/agerio100 | agerio100@naver.com)")
 
