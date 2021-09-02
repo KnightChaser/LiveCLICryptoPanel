@@ -259,10 +259,10 @@ def runProgram():
                 # runtime log
                 print("==========================================================================================================================================================")
                 print("업데이트 시각 : {} | 업데이트 횟수 : {:,} 회 | API Call 실패 : {:,} 회 | 기타 에러 : {:,} 회 | Uptime 비율 : {} % | {:.3f} sec/process"
-                            .format(now.strftime('%Y년 %m월 %d일 %H시 %M분 %S초'), updateCycleCount, apiCallFailedCount, exceptionCount, uptimeRatio,
+                            .format(now.strftime('%Y. %m. %d. %H:%M:%S'), updateCycleCount, apiCallFailedCount, exceptionCount, uptimeRatio,
                                     finishPerformanceMeasurement - startPerformanceMeasurement))
                 print("==========================================================================================================================================================")
-                print("powered by UPBIT. created by LUMINOUS(blog.naver.com/agerio100 | agerio100@naver.com)")
+                print("Powered by UPBIT. Created by LUMINOUS(blog.naver.com/agerio100 | agerio100@naver.com) | 업데이트 주기 : {} sec".format(refreshInterval))
 
                 # wait for designated refresh interval
                 sleep(refreshInterval)
