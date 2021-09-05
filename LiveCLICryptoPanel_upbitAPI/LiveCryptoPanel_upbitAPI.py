@@ -237,13 +237,20 @@ def runProgram():
             # gathering data
             cryptoDataBundle = gatherInformation(APIqueryURL)
 
-            # dataprocessing
-            # Flag, cryptoDataBundle, totalUPBITKRWMarketTradePrice24hr, totalUPBITBTCMarketTradePrice24hr, currentBTCprice = cryptoDataProcessing(APIqueryURL, dataSortCriterion, sortDirection)
-            FLAG, cryptoDataBundle, totalUPBITKRWMarketTradePrice24hr, totalUPBITBTCMarketTradePrice24hr, currentBTCprice = cryptoDataProcessing(cryptoDataBundle, dataSortCriterion, sortDirection)
+            try:
 
-            # data printing (do only data processing process was done without any error)
-            if FLAG == "DataProcessingSuccessful":
-                FLAG, previousCryptoValueChange = cryptoDataPrinting(cryptoDataBundle, previousCryptoValueChange, cryptoShowQuantity, totalUPBITKRWMarketTradePrice24hr, totalUPBITBTCMarketTradePrice24hr, currentBTCprice)
+                # dataprocessing
+                # Flag, cryptoDataBundle, totalUPBITKRWMarketTradePrice24hr, totalUPBITBTCMarketTradePrice24hr, currentBTCprice = cryptoDataProcessing(APIqueryURL, dataSortCriterion, sortDirection)
+                FLAG, cryptoDataBundle, totalUPBITKRWMarketTradePrice24hr, totalUPBITBTCMarketTradePrice24hr, currentBTCprice = cryptoDataProcessing(cryptoDataBundle, dataSortCriterion, sortDirection)
+
+                # data printing (do only data processing process was done without any error)
+                if FLAG == "DataProcessingSuccessful":
+                    FLAG, previousCryptoValueChange = cryptoDataPrinting(cryptoDataBundle, previousCryptoValueChange, cryptoShowQuantity, totalUPBITKRWMarketTradePrice24hr, totalUPBITBTCMarketTradePrice24hr, currentBTCprice)
+
+            except:
+
+                # set flag as failure and retry
+                FLAG == "unexpectedErrorAtCryptoDataProcessing"
 
             # if everything went successfully
             if FLAG == "everythingWasSuccessful":
