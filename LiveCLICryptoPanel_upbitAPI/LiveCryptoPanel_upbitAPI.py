@@ -93,7 +93,7 @@ def cryptoDataPrinting(cryptoDataBundle, previousCryptoValueChange, cryptoShowQu
 
         os.system("cls")
 
-        print("  종목    마켓       가격                변동량(변동률)              24시간 고가      24시간 저가                    24시간 거래량")
+        print("  종목    마켓        가격                 변동량(변동률)              24시간 고가      24시간 저가                    24시간 거래량")
         print("==========================================================================================================================================================")
 
         #for sequence in range(len(cryptoDataBundle)):          # if you want to show everything..
@@ -153,7 +153,7 @@ def cryptoDataPrinting(cryptoDataBundle, previousCryptoValueChange, cryptoShowQu
 
 
             # print information!
-            print("{0:^7} | {1} | ₩ {2:>11} ( {3:>23}~{4:>23} {5} {6}) | ₩ {7:>11} | ₩ {8:>11} | ₩ {9:>19} ( ≈{10:>20} {11:^7}) ".
+            print("{0:^7} | {1} | ₩ {2:>11} ( {3:>25}~{4:>23} {5} {6}) | ₩ {7:>11} | ₩ {8:>11} | ₩ {9:>19} ( ≈{10:>20} {11:^7}) ".
                 format(symbol, marketType, currentPrice, changePrice, changeRate, changeArrow, liveCryptoValueChangeDirection,
                     highPrice, lowPrice, accumulatedTradePrice24hr, accumulatedTradeVolume24hr, symbol))
 
